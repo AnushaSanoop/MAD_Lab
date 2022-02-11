@@ -1,0 +1,280 @@
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="328dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Name"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/textid"
+        android:layout_width="328dp"
+        android:layout_height="wrap_content"
+        android:layout_row="1"
+        android:layout_column="0"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="id"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/surname"
+        android:layout_width="319dp"
+        android:layout_height="wrap_content"
+        android:layout_row="2"
+        android:layout_column="0"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Surname"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/marks"
+        android:layout_width="333dp"
+        android:layout_height="65dp"
+        android:layout_row="3"
+        android:layout_column="0"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="marks"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/add"
+        android:layout_width="217dp"
+        android:layout_height="61dp"
+        android:layout_row="4"
+        android:layout_column="0"
+        android:text="ADD" />
+
+    <Button
+        android:id="@+id/view"
+        android:layout_width="217dp"
+        android:layout_height="61dp"
+        android:layout_row="5"
+        android:layout_column="0"
+        android:text="VIEW" />
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="217dp"
+        android:layout_height="61dp"
+        android:layout_row="6"
+        android:layout_column="0"
+        android:text="DELETE" />
+
+    <Button
+        android:id="@+id/viewall"
+        android:layout_width="217dp"
+        android:layout_height="61dp"
+        android:layout_row="7"
+        android:layout_column="0"
+        android:text="VIEWALL" />
+
+    <Button
+        android:id="@+id/update"
+        android:layout_width="217dp"
+        android:layout_height="61dp"
+        android:layout_row="8"
+        android:layout_column="0"
+        android:text="UPDATE" />
+</GridLayout>
+
+MainActivity.java
+
+package com.example.sqlite;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
+    EditText name,editid,surname,mark;
+    Button badd,bview,bupdate,bdelete,bviewall;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        myDb=new DatabaseHelper(this);
+        name=findViewById(R.id.name);
+        editid=findViewById(R.id.textid);
+        surname=findViewById(R.id.surname);
+        mark=findViewById(R.id.marks);
+        badd=findViewById(R.id.add);
+        bview=findViewById(R.id.view);
+        bupdate=findViewById(R.id.update);
+        bdelete=findViewById(R.id.delete);
+        bviewall=findViewById(R.id.viewall);
+        AddData();
+        getData();
+        updateData();
+        deleteData();
+        viewall();
+    }
+    private void AddData(){
+        badd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isInserted=myDb.insertData(name.getText().toString(),surname.getText().toString(),mark.getText().toString());
+                if(isInserted==true)
+                    Toast.makeText(MainActivity.this,"Data Inserted",Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivity.this,"Data could not be Inserted",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void getData(){
+        bview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id=editid.getText().toString();
+                if (id.equals(String.valueOf(""))){
+                    editid.setError("Enter id to get data");
+                    return;
+                }
+                Cursor res=myDb.getData(id);
+                String data=null;
+                if(res.moveToFirst()){
+                    data="Id:"+res.getString(0)+"\n"+"Name:"+res.getString(1)+"\n\n"+"Surname:"+res.getString(2)+""+"\n\n"+"Marks:"+res.getString(3)+"\n\n";
+                }
+                showMessage("Data",data);
+            }
+        });
+    }
+    private void viewall(){
+        bviewall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Cursor res=myDb.getAllData();
+                if(res.getCount()==0){
+                    showMessage("Error","Nothing found");
+                    return;
+                }
+                StringBuffer buffer=new StringBuffer();
+                while (res.moveToNext()){
+                    buffer.append("Id:"+res.getString(0)+"\n");
+                    buffer.append("Name:"+res.getString(1)+"\n\n");
+                    buffer.append("Surname:"+res.getString(2)+"\n\n");
+                    buffer.append("Marks:"+res.getString(3)+"\n\n");
+                }
+                showMessage("Data",buffer.toString());
+            }
+        });
+    }
+    private void updateData(){
+        bupdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isupdate=myDb.updateData(editid.getText().toString(),name.getText().toString(),surname.getText().toString(),mark.getText().toString());
+                if(isupdate==true)
+                    Toast.makeText(MainActivity.this,"Data Updated",Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivity.this,"Data could not be Updated",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void deleteData(){
+        bdelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Integer deleteRows=myDb.deleteData(editid.getText().toString());
+                if(deleteRows>0)
+                    Toast.makeText(MainActivity.this,"Data Deleted",Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivity.this,"Data could not be Deleted",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void showMessage(String title,String message){
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.create();
+        builder.setCancelable(true);
+        builder.setMessage(message);
+        builder.show();
+    }
+}
+
+DatabaseHelper.java
+
+package com.example.sqlite;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+    public final static String DATABASE_NAME="student.db";
+    public final static String TABLE_NAME="student_table";
+    public final static String COL_1="ID";
+    public final static String COL_2="NAME";
+    public final static String COL_3="SURNAME";
+    public final static String COL_4="MARKS";
+
+    public DatabaseHelper(Context context){
+        super(context,DATABASE_NAME,null,1);
+    }
+    public void onCreate(SQLiteDatabase db){
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"(ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT, SURNAME TEXT, MARKS INTEGER)");
+    }
+    public void onUpgrade(SQLiteDatabase db,int oldversion, int newversion){
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
+        onCreate(db);
+    }
+    public boolean insertData(String name, String surname, String marks){
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(COL_2,name);
+        cv.put(COL_3,surname);
+        cv.put(COL_4,marks);
+        long result=db.insert(TABLE_NAME,null,cv);
+        if(result==-1) return false;
+        else return true;
+    }
+    public Cursor getData(String id){
+        SQLiteDatabase db=this.getWritableDatabase();
+        String query="SELECT * FROM "+TABLE_NAME+" WHERE ID = "+id+" ";
+        Cursor cursor=db.rawQuery(query,null);
+        return cursor;
+    }
+    public boolean updateData(String id,String name, String surname, String marks) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_1, id);
+        contentValues.put(COL_2, name);
+        contentValues.put(COL_3, surname);
+        contentValues.put(COL_4, marks);
+        db.update(TABLE_NAME, contentValues, "ID=?", new String[]{id});
+        return true;
+    }
+    public Integer deleteData(String id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_NAME,"ID=?", new String[]{id});
+    }
+    public Cursor getAllData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res=db.rawQuery("SELECT * FROM "+TABLE_NAME,null);
+        return res;
+    }
+}
