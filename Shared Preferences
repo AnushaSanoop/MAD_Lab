@@ -1,0 +1,100 @@
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Name"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Address"
+        android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/savedata"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SaveData" />
+
+    <Button
+        android:id="@+id/retdata"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="RetrieveData" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+</LinearLayout>
+
+
+MainActivity.java
+
+
+package com.example.sharedpreferences;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+    EditText editTextname,editTextaddress;
+    Button saveData, retData;
+    TextView textView;
+    SharedPreferences sharedPreferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextname=findViewById(R.id.name);
+        editTextaddress=findViewById(R.id.address);
+        saveData=findViewById(R.id.savedata);
+        retData=findViewById(R.id.retdata);
+        textView=findViewById(R.id.textView);
+        sharedPreferences=getSharedPreferences("Name",MODE_PRIVATE);
+        saveData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name=editTextname.getText().toString();
+                String address=editTextaddress.getText().toString();
+                SharedPreferences.Editor editor=sharedPreferences.edit();
+                editor.putString("Name",name);
+                editor.putString("Address",address);
+                editor.apply();
+            }
+        });
+        retData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name=sharedPreferences.getString("Name","");
+                String address=sharedPreferences.getString("Address","");
+                textView.setText("Name: "+name+"\nAddress: "+address);
+                textView.setTextColor(Color.BLACK);
+                textView.setTextSize(30);
+            }
+        });
+    }
+}
