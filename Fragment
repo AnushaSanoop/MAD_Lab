@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textSize="30dp"
         android:text="This is fragment1" />
 
 </FrameLayout>
@@ -131,6 +132,7 @@ public class fragment_one extends Fragment {
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textSize="30dp"
         android:text="This is fragment2" />
 
 </FrameLayout>
