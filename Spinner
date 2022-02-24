@@ -1,4 +1,4 @@
-Java code 
+MainActivity.java
 package com.example.spinner;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 }
 
 
-XMl code spinner:
+activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
